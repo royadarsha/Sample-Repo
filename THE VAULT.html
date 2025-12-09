@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE VAULT | MODENITY Archives</title>
+    <style>
+        /* --- RESET & VARIABLES (MODENITY THEME) --- */
+        :root {
+            --primary-blue: #0f3057;   /* Deep Navy */
+            --secondary-blue: #005b96; /* Lighter Blue */
+            --accent-beige: #e6e2d3;   /* Warm Beige */
+            --bg-beige-light: #f7f6f2; /* Very light beige */
+            --text-dark: #333;
+            --text-light: #666;
+            --bg-white: #fff;
+            --footer-bg: #0a223d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            color: var(--text-dark);
+            background-color: var(--bg-white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; }
+
+        /* --- ANIMATION UTILITIES --- */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal-on-scroll.is-visible { opacity: 1; transform: translateY(0); }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- HEADER --- */
+        header { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+        .top-bar { background: var(--accent-beige); color: var(--primary-blue); text-align: center; font-size: 0.75rem; padding: 8px 0; letter-spacing: 1px; font-weight: 600; }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; max-width: 1400px; margin: 0 auto; }
+        .logo { font-size: 1.8rem; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--primary-blue); }
+        nav ul { display: flex; gap: 25px; }
+        nav a { font-size: 0.85rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; color: var(--text-dark); position: relative; }
+        nav a::after { content: ''; display: block; width: 0; height: 2px; background: var(--secondary-blue); transition: width .3s; position: absolute; bottom: -5px; left: 0; }
+        nav a:hover::after { width: 100%; }
+        .nav-icons { display: flex; gap: 15px; font-size: 1.1rem; color: var(--primary-blue); }
+        .mobile-toggle { display: none; font-size: 1.5rem; cursor: pointer; }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            position: relative;
+            width: 100%;
+            height: 50vh;
+            background-color: var(--primary-blue);
+            background-image: url('https://placehold.co/1600x600/0f3057/ffffff?text=Secure+Archives');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #fff;
+        }
+
+        .hero::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 48, 87, 0.7);
+        }
+
+        .hero-content { position: relative; z-index: 2; padding: 20px; }
+        
+        .hero h1 {
+            font-size: 3.5rem; font-weight: 300; letter-spacing: 5px;
+            margin-bottom: 15px; text-transform: uppercase;
+            animation: slideUp 1s ease-out;
+        }
+        @keyframes slideUp { from{transform:translateY(20px); opacity:0;} to{transform:translateY(0); opacity:1;} }
+
+        /* --- SEARCH --- */
+        .search-wrapper {
+            background: var(--bg-beige-light);
+            padding: 40px 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .search-container {
+            width: 100%; max-width: 800px; margin: 0 auto; position: relative;
+        }
+        #vaultSearch {
+            width: 100%; padding: 20px 25px;
+            border: 1px solid #ddd; border-radius: 50px;
+            font-size: 1rem; outline: none;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        #vaultSearch:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 10px 25px rgba(15, 48, 87, 0.15);
+        }
+
+        /* --- MAIN CONTENT --- */
+        .content-container {
+            max-width: 1400px; margin: 0 auto; padding: 60px 20px;
+        }
+
+        .section-header {
+            margin-bottom: 30px; margin-top: 40px;
+            border-bottom: 2px solid var(--accent-beige);
+            padding-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-end;
+        }
+
+        .section-title {
+            font-size: 1.5rem; text-transform: uppercase; font-weight: 700;
+            letter-spacing: 2px; margin: 0; color: var(--primary-blue);
+        }
+
+        .scroll-hint {
+            font-size: 0.75rem; color: var(--secondary-blue); text-transform: uppercase; letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* --- HORIZONTAL SCROLL ZONES --- */
+        .horizontal-scroll-zone {
+            display: flex; overflow-x: auto; gap: 25px; padding: 20px 5px 40px;
+            scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
+        }
+
+        /* Scrollbar Styling */
+        .horizontal-scroll-zone::-webkit-scrollbar { height: 8px; }
+        .horizontal-scroll-zone::-webkit-scrollbar-track { background: var(--bg-beige-light); border-radius: 4px; }
+        .horizontal-scroll-zone::-webkit-scrollbar-thumb { background: var(--primary-blue); border-radius: 4px; }
+        .horizontal-scroll-zone::-webkit-scrollbar-thumb:hover { background: var(--secondary-blue); }
+
+        /* --- GRID VIEW ZONE (Hidden by default) --- */
+        .grid-view-zone {
+            display: none; /* Hidden initially */
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 20px 5px 40px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* --- FILE CARDS --- */
+        .file-item {
+            /* Flex properties for Scroll View */
+            flex: 0 0 280px; min-width: 280px; 
+            height: 180px;
+            padding: 30px;
+            background: #fff; border: 1px solid #e0e0e0;
+            cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; top: 0;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+
+        /* Adjustments for Grid View */
+        .grid-view-zone .file-item {
+            flex: unset; /* Remove scroll constraints */
+            width: 100%;
+        }
+
+        .file-item:hover {
+            border-color: var(--secondary-blue);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(15, 48, 87, 0.1);
+        }
+
+        .file-top h3 {
+            font-size: 1rem; font-weight: 700; margin-bottom: 5px;
+            text-transform: uppercase; line-height: 1.3; color: var(--primary-blue);
+        }
+
+        .file-bottom {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            font-size: 0.75rem; color: #888; border-top: 1px solid #f0f0f0; padding-top: 15px;
+        }
+
+        .icon-dl {
+            font-size: 1.2rem; color: var(--accent-beige); transition: 0.3s;
+        }
+        .file-item:hover .icon-dl { color: var(--primary-blue); transform: translateY(2px); }
+
+        .badge-new {
+            background-color: var(--primary-blue); color: #fff;
+            font-size: 0.6rem; padding: 4px 8px;
+            position: absolute; top: -10px; right: 20px;
+            text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(15, 48, 87, 0.2);
+        }
+
+        /* --- BUTTONS --- */
+        .view-more-container { text-align: center; margin-top: 10px; }
+        .btn-view-more {
+            background-color: transparent; color: var(--primary-blue);
+            border: 1px solid var(--primary-blue); padding: 12px 30px;
+            font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer; transition: 0.3s;
+        }
+        .btn-view-more:hover {
+            background-color: var(--primary-blue); color: #fff;
+        }
+
+        /* --- FOOTER --- */
+        footer { background-color: var(--footer-bg); color: #fff; padding: 60px 5% 20px; font-size: 0.9rem; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; max-width: 1400px; margin: 0 auto; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 40px; }
+        .footer-col h4 { color: var(--accent-beige); margin-bottom: 20px; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
+        .footer-col ul li { margin-bottom: 10px; color: #ccc; }
+        .footer-bottom { text-align: center; padding-top: 20px; color: #888; font-size: 0.8rem; }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .nav-container nav { display: none; }
+            .mobile-toggle { display: block; }
+            .hero h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">SECURE ACCESS ID: 899-21-X | STATUS: ENCRYPTED</div>
+
+    <header>
+        <div class="nav-container">
+            <div class="logo">MODENITY</div>
+            <nav>
+                <ul>
+                    <li><a href="main homepage.html">Home</a></li>
+                    <li><a href="OUR COLLECTIONS.html">Our collection</a></li>
+                    <li><a href="OUR COLLECTIONS.html">Curated works</a></li>
+                    <li><a href="vault.html" style="color:var(--secondary-blue);">The vault</a></li>
+                    <li><a href="our story.html">Our story</a></li>
+                </ul>
+            </nav>
+            <div class="nav-icons">O
+                <div class="mobile-toggle">&#9776;</div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Central Archives</h1>
+            <p>Classified Assets & Technical Schematics</p>
+        </div>
+    </section>
+
+    <div class="search-wrapper">
+        <div class="search-container">
+            <input type="text" id="vaultSearch" placeholder="SEARCH DATABASE...">
+        </div>
+    </div>
+
+    <div class="content-container">
+
+        <div class="section-header reveal-on-scroll">
+            <h2 class="section-title">Master Catalogs</h2>
+            </div>
+        
+        <div class="horizontal-scroll-zone reveal-on-scroll" id="catalog-scroll" style="justify-content: flex-start;">
+            </div>
+
+        <div class="section-header reveal-on-scroll">
+            <h2 class="section-title">Asset Brochures</h2>
+            <span class="scroll-hint" id="scroll-hint-text">SCROLL &rarr;</span>
+        </div>
+
+        <div class="horizontal-scroll-zone reveal-on-scroll" id="brochure-scroll">
+             </div>
+
+        <div class="grid-view-zone" id="brochure-grid">
+            </div>
+
+        <div class="view-more-container reveal-on-scroll">
+            <button class="btn-view-more" id="viewToggleBtn" onclick="toggleBrochureView()">View All Brochures</button>
+        </div>
+
+    </div>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Facility Info</h4>
+                <ul>
+                    <li>Sector 7, Underground Level 4</li>
+                    <li>Coordinates: 45.22, -12.44</li>
+                    <li>Auth Code: X-99</li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>System Links</h4>
+                <ul>
+                    <li><a href="#">System Status</a></li>
+                    <li><a href="#">User Permissions</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Updates</h4>
+                <ul>
+                    <li>System Update v4.5 - Completed</li>
+                    <li>Archive Digitization - 98%</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2025 THE VAULT by MODENITY. UNAUTHORIZED ACCESS IS PROHIBITED.
+        </div>
+    </footer>
+
+    <script>
+        // Data
+        const data = {
+            // Exactly 2 items as requested
+            catalogs: [
+                { name: "Master Floor Catalog 2025", type: "PDF", size: "125MB", new: true },
+                { name: "Master Wall Catalog 2025", type: "PDF", size: "98MB", new: true }
+            ],
+            // Many items
+            brochures: [
+                { name: "Project: Chimera", type: "PDF", size: "2.4MB", new: true },
+                { name: "Operation: Blackout", type: "PDF", size: "5.1MB", new: true },
+                { name: "Entity: 882", type: "PDF", size: "1.2MB", new: true },
+                { name: "Asset: Viper", type: "PDF", size: "800KB", new: false },
+                { name: "Weaponry: Type-Z", type: "PDF", size: "14MB", new: false },
+                { name: "Location: Site B", type: "PDF", size: "3.5MB", new: false },
+                { name: "Protocol: Omega", type: "DOC", size: "120KB", new: false },
+                { name: "Surveillance Logs", type: "ZIP", size: "1.2GB", new: false },
+                { name: "Agent Roster: East", type: "PDF", size: "4MB", new: false },
+                { name: "Supply Chain: EU", type: "XLS", size: "2MB", new: false },
+                { name: "Supply Chain: US", type: "XLS", size: "2MB", new: false }
+            ]
+        };
+
+        // Render Function
+        function renderSection(containerId, items) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = "";
+
+            if (items.length === 0) {
+                container.innerHTML = "<p style='padding:20px; color:#999;'>No matches found.</p>";
+                return;
+            }
+
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'file-item';
+                
+                const badge = item.new ? `<span class="badge-new">NEW</span>` : '';
+
+                div.innerHTML = `
+                    ${badge}
+                    <div class="file-top">
+                        <h3>${item.name}</h3>
+                    </div>
+                    <div class="file-bottom">
+                        <div>
+                            <div style="font-weight:700; color:var(--primary-blue)">${item.type}</div>
+                            <div>${item.size}</div>
+                        </div>
+                        <div class="icon-dl">⬇</div>
+                    </div>
+                `;
+                
+                div.onclick = () => alert(`Initiating secure download: ${item.name}...`);
+                container.appendChild(div);
+            });
+        }
+
+        // Toggle View Function
+        function toggleBrochureView() {
+            const scrollView = document.getElementById('brochure-scroll');
+            const gridView = document.getElementById('brochure-grid');
+            const btn = document.getElementById('viewToggleBtn');
+            const scrollHint = document.getElementById('scroll-hint-text');
+
+            if (gridView.style.display === 'grid') {
+                // Switch back to Scroll
+                gridView.style.display = 'none';
+                scrollView.style.display = 'flex';
+                btn.innerText = "View All Brochures";
+                scrollHint.style.opacity = '1';
+            } else {
+                // Switch to Grid
+                scrollView.style.display = 'none';
+                gridView.style.display = 'grid';
+                btn.innerText = "View Less (Scroll Mode)";
+                scrollHint.style.opacity = '0';
+                
+                // Render grid if empty
+                if(gridView.children.length === 0) {
+                    renderSection('brochure-grid', data.brochures);
+                }
+            }
+        }
+
+        // Initialize & Scroll Reveal
+        function init() {
+            renderSection('catalog-scroll', data.catalogs);
+            renderSection('brochure-scroll', data.brochures);
+            initScrollReveal();
+        }
+
+        function initScrollReveal() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.reveal-on-scroll').forEach(target => observer.observe(target));
+        }
+
+        // Search
+        document.getElementById('vaultSearch').addEventListener('keyup', function(e) {
+            const term = e.target.value.toLowerCase();
+            
+            const filteredCat = data.catalogs.filter(i => i.name.toLowerCase().includes(term));
+            const filteredBro = data.brochures.filter(i => i.name.toLowerCase().includes(term));
+
+            renderSection('catalog-scroll', filteredCat);
+            renderSection('brochure-scroll', filteredBro);
+            renderSection('brochure-grid', filteredBro); // Update grid too if active
+        });
+
+        // Horizontal Scroll via Mouse Wheel
+        const scrollContainers = document.querySelectorAll('.horizontal-scroll-zone');
+        scrollContainers.forEach(container => {
+            container.addEventListener('wheel', (evt) => {
+                if(container.scrollWidth > container.clientWidth) {
+                    evt.preventDefault();
+                    container.scrollLeft += evt.deltaY;
+                }
+            });
+        });
+
+        init();
+
+    </script>
+</body>
+</html>
