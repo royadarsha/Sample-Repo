@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curated Works | MODENITY</title>
+    <style>
+        /* --- RESET & VARIABLES (MODENITY THEME) --- */
+        :root {
+            --primary-blue: #0f3057;   /* Deep Navy */
+            --secondary-blue: #005b96; /* Lighter Blue */
+            --accent-beige: #e6e2d3;   /* Warm Beige */
+            --bg-beige-light: #f7f6f2; /* Very light beige */
+            --text-dark: #333;
+            --text-light: #666;
+            --bg-white: #fff;
+            --footer-bg: #0a223d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+
+        body {
+            color: var(--text-dark);
+            background-color: var(--bg-white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; }
+        img { max-width: 100%; display: block; }
+
+        /* --- HEADER --- */
+        header { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+        .top-bar { background: var(--accent-beige); color: var(--primary-blue); text-align: center; font-size: 0.75rem; padding: 8px 0; letter-spacing: 1px; font-weight: 600; }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; max-width: 1200px; margin: 0 auto; }
+        .logo { font-size: 1.8rem; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--primary-blue); }
+        nav ul { display: flex; gap: 25px; }
+        nav a { font-size: 0.85rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; color: var(--text-dark); position: relative; }
+        nav a::after { content: ''; display: block; width: 0; height: 2px; background: var(--secondary-blue); transition: width .3s; position: absolute; bottom: -5px; left: 0; }
+        nav a:hover::after { width: 100%; }
+        .nav-icons { display: flex; gap: 15px; font-size: 1.1rem; color: var(--primary-blue); }
+        .mobile-toggle { display: none; font-size: 1.5rem; cursor: pointer; }
+
+        /* --- COLLAGE HERO SECTION --- */
+        /* Implements the "Collage Mechanism" from notes */
+        .collage-section {
+            position: relative;
+            width: 100%;
+            height: 100vh; /* Full viewport height */
+            background-color: #fff;
+            overflow: hidden;
+        }
+
+        /* The Grid */
+        .collage-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 columns */
+            grid-template-rows: repeat(3, 1fr);    /* 3 rows */
+            height: 100%;
+            width: 100%;
+        }
+
+        .collage-item {
+            position: relative;
+            overflow: hidden;
+            opacity: 0; /* Hidden initially for animation */
+            transform: scale(0.9);
+            transition: all 1s cubic-bezier(0.215, 0.610, 0.355, 1.000);
+        }
+
+        .collage-item.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .collage-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%);
+            transition: filter 0.5s ease;
+        }
+
+        .collage-item:hover img {
+            filter: grayscale(0%);
+        }
+
+        /* The Center Title Block (Floating) */
+        .hero-center-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 60px 80px;
+            text-align: center;
+            z-index: 10;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            border: 1px solid var(--accent-beige);
+        }
+
+        .hero-center-box h1 {
+            font-size: 3.5rem;
+            color: var(--primary-blue);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .hero-center-box p {
+            font-size: 1rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* --- ZIG ZAG / CROSS DESIGN SECTION --- */
+        /* Implements "Mid-Section" from notes */
+        .projects-container {
+            max-width: 1200px;
+            margin: 100px auto;
+            padding: 0 20px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: var(--primary-blue);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .project-step {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr; /* Image is slightly larger */
+            gap: 60px;
+            align-items: center;
+            margin-bottom: 120px;
+        }
+
+        .project-step.reversed {
+            grid-template-columns: 1fr 1.2fr;
+            direction: rtl; /* Flip layout */
+        }
+        .project-step.reversed .project-content {
+            direction: ltr; /* Reset text direction */
+        }
+
+        /* Animation Classes */
+        .reveal-box {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal-box.in-view {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Project Image & Slider Placeholder */
+        .project-visual {
+            position: relative;
+            height: 500px;
+            overflow: hidden;
+            border-radius: 4px;
+            box-shadow: 0 20px 40px rgba(15, 48, 87, 0.15);
+        }
+
+        .project-visual img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        
+        .project-visual:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Slider Indicators (Visual only as requested "Visualized with a slider") */
+        .slider-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+        .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.5); border-radius: 50%; }
+        .dot.active { background: #fff; transform: scale(1.2); }
+
+        /* Project Content */
+        .project-content {
+            padding: 20px;
+        }
+
+        .project-number {
+            font-size: 4rem;
+            color: var(--accent-beige);
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .project-title {
+            font-size: 2rem;
+            color: var(--primary-blue);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        /* Decorative line under title */
+        .project-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: var(--secondary-blue);
+        }
+
+        /* The "Expectation vs Deliverance" Format */
+        .narrative-box {
+            margin-bottom: 20px;
+        }
+
+        .narrative-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--secondary-blue);
+            margin-bottom: 5px;
+            display: block;
+            letter-spacing: 1px;
+        }
+
+        .narrative-text {
+            font-size: 1rem;
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .btn-link {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--primary-blue);
+            padding-bottom: 2px;
+        }
+
+        /* --- FOOTER --- */
+        footer { background-color: var(--footer-bg); color: #fff; padding: 60px 5% 20px; font-size: 0.9rem; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; max-width: 1400px; margin: 0 auto; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 40px; }
+        .footer-col h4 { color: var(--accent-beige); margin-bottom: 20px; text-transform: uppercase; }
+        .footer-col p, .footer-col li { color: #ccc; margin-bottom: 10px; }
+        .footer-col a:hover { color: var(--accent-beige); }
+        .copyright { text-align: center; padding-top: 20px; color: #888; font-size: 0.8rem; }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .nav-container nav { display: none; }
+            .mobile-toggle { display: block; }
+            
+            /* Collage Stack */
+            .collage-grid { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(6, 1fr); }
+            .hero-center-box { width: 90%; padding: 30px; }
+            .hero-center-box h1 { font-size: 2rem; }
+
+            /* Project Stack */
+            .project-step, .project-step.reversed { grid-template-columns: 1fr; gap: 30px; direction: ltr; }
+            .project-visual { height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">PREMIUM DESIGNER IMPORTED SURFACES & TILES</div>
+
+    <header>
+        <div class="nav-container">
+            <div class="logo">MODENITY</div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="collections.html">Collections</a></li>
+                    <li><a href="#" style="color:var(--secondary-blue);">Curated Works</a></li>
+                    <li><a href="vault.html">The Vault</a></li>
+                    <li><a href="our-story.html">Our Story</a></li>
+                </ul>
+            </nav>
+            <div class="nav-icons">
+                <a href="#">&#128269;</a>
+                <a href="#">&#128722;</a>
+                <div class="mobile-toggle">&#9776;</div>
+            </div>
+        </div>
+    </header>
+
+    <section class="collage-section">
+        <div class="collage-grid">
+            <div class="collage-item"><img src="worker.jpg" alt="Work"></div>
+            <div class="collage-item"><img src="image 0.jpg" alt="Work"></div>
+            <div class="collage-item"><img src="image 10.jpg" alt="Work"></div>
+            <div class="collage-item"><img src="image 11.jpg" alt="Work"></div>    
+            <div class="collage-item"><img src="image 2.jpg" alt="Work"></div>
+            <div class="collage-item"><img src="image 3.jpg" alt="Texture"></div> 
+            <div class="collage-item"><img src="image 5.jpg" alt="Detail"></div>
+            <div class="collage-item"><img src="image 6.jpg" alt="Work"></div>
+            <div class="collage-item"><img src="image 7.jpg" alt="Work"></div>
+            <div class="collage-item"><img src="image 8.jpg" alt="Work"></div>
+            <div class="collage-item"><img src="image 5 (2).jpg" alt="Work"></div>
+            <div class="collage-item"><img src="image 4.jpg" alt="Work"></div>
+        </div>
+
+        <div class="hero-center-box">
+            <h1>Curated Works</h1>
+            <p>Our Deliverance of Excellence</p>
+        </div>
+    </section>
+
+    <div class="projects-container">
+        
+        <div class="section-header">
+            <h2>Featured Projects</h2>
+            <p style="color:#666; max-width:600px; margin:0 auto;">A showcase of how we bridge the gap between imagination and reality.</p>
+        </div>
+
+        <div class="project-step">
+            <div class="project-visual reveal-box">
+                <img src="image 3.jpg" alt="Project 1">
+                <div class="slider-indicators">
+                    <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+                </div>
+            </div>
+            <div class="project-content reveal-box">
+                <div class="project-number">01</div>
+                <h3 class="project-title">The Azure Residency</h3>
+                
+                <div class="narrative-box">
+                    <span class="narrative-label">The Vision (Client Expectations)</span>
+                    <p class="narrative-text">The client envisioned a sanctuary that mirrored the calmness of the ocean. They required large-format surfaces with minimal grout lines to create an illusion of infinite space.</p>
+                </div>
+
+                <div class="narrative-box">
+                    <span class="narrative-label">The Reality (Our Deliverance)</span>
+                    <p class="narrative-text">We implemented our 'Blue Series' 1200x2400mm slabs. By using a specialized color-matched epoxy grout, we achieved a seamless monolithic floor that feels like walking on water.</p>
+                </div>
+                
+                
+            </div>
+        </div>
+
+        <div class="project-step reversed">
+            <div class="project-visual reveal-box">
+                <img src="image 6.jpg" alt="Project 2">
+                <div class="slider-indicators">
+                    <div class="dot active"></div><div class="dot"></div>
+                </div>
+            </div>
+            <div class="project-content reveal-box">
+                <div class="project-number">02</div>
+                <h3 class="project-title">Corporate Heights Lobby</h3>
+                
+                <div class="narrative-box">
+                    <span class="narrative-label">The Vision (Client Expectations)</span>
+                    <p class="narrative-text">A high-traffic commercial space that needed to exude authority and luxury without compromising on durability. The concern was wear-and-tear over time.</p>
+                </div>
+
+                <div class="narrative-box">
+                    <span class="narrative-label">The Reality (Our Deliverance)</span>
+                    <p class="narrative-text">We selected the 'Beige Naturals' collection with a specialized high-MOHS hardness rating. The result is a grand, warm lobby that withstands thousands of footsteps daily while maintaining its pristine gloss.</p>
+                </div>
+
+                
+            </div>
+        </div>
+
+        <div class="project-step">
+            <div class="project-visual reveal-box">
+                <img src="image 7.jpg" alt="Project 3">
+                <div class="slider-indicators">
+                    <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+                </div>
+            </div>
+            <div class="project-content reveal-box">
+                <div class="project-number">03</div>
+                <h3 class="project-title">The Minimalist Villa</h3>
+                
+                <div class="narrative-box">
+                    <span class="narrative-label">The Vision (Client Expectations)</span>
+                    <p class="narrative-text">The architect demanded 'invisible' transitions between indoor and outdoor spaces. They wanted the patio to feel like an extension of the living room.</p>
+                </div>
+
+                <div class="narrative-box">
+                    <span class="narrative-label">The Reality (Our Deliverance)</span>
+                    <p class="narrative-text">Modenity utilized its Outdoor Pavers with R11 anti-slip finish for the exterior, perfectly color-matched to the smooth interior matt tiles. The visual continuity was flawless.</p>
+                </div>
+
+                
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Contact Modenity</h4>
+                <p>101, Blue Horizon Plaza, Design District, Mumbai-400 057</p>
+                <p>Email: hello@modenity.com</p>
+            </div>
+            <div class="footer-col">
+                <h4>Collections</h4>
+                <ul>
+                    <li><a href="#">The Blue Series</a></li>
+                    <li><a href="#">Beige Naturals</a></li>
+                    <li><a href="#">Outdoor Pavers</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Newsletter</h4>
+                <p>Subscribe for design inspiration.</p>
+                <input type="email" placeholder="Your email..." style="padding:10px; width:100%; border:none; margin-top:10px;">
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 Modenity Ceramics. All Rights Reserved.
+        </div>
+    </footer>
+
+    <script>
+        // --- COLLAGE ENTRANCE ANIMATION ---
+        // As per notes: "Images will be transitioned and arranged... while opening the webpage"
+        document.addEventListener('DOMContentLoaded', () => {
+            const collageItems = document.querySelectorAll('.collage-item');
+            
+            // Randomly reveal grid items
+            collageItems.forEach((item, index) => {
+                // Generate a random delay between 0 and 1000ms
+                const randomDelay = Math.floor(Math.random() * 800);
+                setTimeout(() => {
+                    item.classList.add('visible');
+                }, randomDelay);
+            });
+
+            // --- SCROLL REVEAL FOR PROJECTS ---
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('in-view');
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal-box').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>
